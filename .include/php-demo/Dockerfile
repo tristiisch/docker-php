@@ -15,5 +15,4 @@ COPY --chown=root:app --chmod=550 ./srcs ./
 # <=========================> Proxy <=========================>
 FROM ghcr.io/tristiisch/nginx-php:latest AS proxy
 
-COPY --chown=root:app --chmod=440 ./assets/img /var/www/html/img
-COPY --chown=root:app --chmod=440 ./assets/logo /var/www/html/logo
+COPY --chown=root:app --chmod=440 ./srcs ./

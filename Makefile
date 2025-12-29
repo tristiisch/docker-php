@@ -3,14 +3,18 @@ APPLICATION_SERVICE			:=	application
 
 STACK_PROD					:= web
 COMPOSE_PROD				:= ./.include/docker-compose.prod.yml
+COMPOSE_PROD_DEMO			:= ./docker-compose.prod-demo.yml
 ENV_PROD					:= .env.prod
 
 PHP_CONF_DEFAULT_PATH		:= ./.include/php/configs/default
 
-all: build up logs
+all: build networks up logs
 
 build:
-	@docker compose build --pull
+	@docker compose build --pull always
+
+networks:
+	@docker network create metrics 2> /dev/null || true
 
 up:
 	@docker compose up -d --remove-orphans
@@ -32,6 +36,10 @@ down:
 
 down-v:
 	@docker compose down -v
+
+test-prod:
+	@docker compose -f $(COMPOSE_PROD_DEMO) build --pull
+	@docker compose -f $(COMPOSE_PROD_DEMO) up -d --remove-orphans --force-recreate
 
 deploy-prod:
 	@export $(shell grep -v '^#' $(ENV_PROD) | xargs) > /dev/null 2>&1 && docker stack deploy --detach=false -c $(COMPOSE_PROD) $(STACK_PROD)

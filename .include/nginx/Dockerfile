@@ -12,20 +12,18 @@ RUN mkdir -p /var/cache/nginx \
 # Config
 COPY --chown=root:$USER --chmod=440 ./.include/nginx/configs/nginx.conf /etc/nginx/nginx.conf
 
-WORKDIR /var/www
+WORKDIR /var/www/
 
 # Errors pages
 RUN mkdir -p ./errors \
 	&& chown root:$USER -R ./errors \
-	&& chmod 550 -R ./errors \
-	&& mkdir -p ./html/errors \
-	&& chown root:$USER -R ./html/errors\
-	&& chmod 550 -R ./html/errors
-COPY --chown=root:$USER --chmod=440 ./.include/nginx/errors/*.html ./errors
-COPY --chown=root:$USER --chmod=440 ./.include/nginx/errors/*.css ./html/errors
+	&& chmod 550 -R ./errors
+COPY --chown=root:$USER --chmod=440 ./.include/nginx/errors/* ./errors
 
-# Assets
-COPY --chown=root:$USER --chmod=550 ./assets ./html/assets
+WORKDIR /var/www/html
+
+# Public files
+COPY --chown=root:$USER --chmod=550 ./srcs/public ./public
 
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 \
   CMD curl --fail --location http://localhost/ping_nginx || exit 1

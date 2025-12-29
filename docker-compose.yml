@@ -1,7 +1,7 @@
 services:
 
   application:
-    image: "docker-php/php-demo:local"
+    image: docker-php/php-demo:local
     build:
       dockerfile: ./.include/php-demo/Dockerfile
       target: app_development
@@ -12,27 +12,14 @@ services:
       replicas: 2
 
   proxy:
-    image: "docker-php/nginx-php:local"
+    image: docker-php/nginx-php:local
     build:
       dockerfile: ./.include/nginx/Dockerfile
       target: default
       context: .
     volumes:
-      - ./assets/img:/var/www/html/img:ro
-      - ./assets/logo:/var/www/html/logo:ro
+      - ./srcs:/var/www/html:ro
     ports:
       - 80:80
     deploy:
       replicas: 2
-
-  proxy_metrics:
-    image: nginx/nginx-prometheus-exporter:1.4.0
-    command:
-      - --nginx.scrape-uri=http://proxy/status_nginx
-    networks:
-      - default
-      - metrics
-
-networks:
-  metrics:
-    external: true

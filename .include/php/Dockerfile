@@ -59,7 +59,7 @@ ARG USER
 
 # Debug Tools
 USER root
-ENV XDEBUG_TRIGGER "yes"
+ENV XDEBUG_TRIGGER="yes"
 RUN apk add --virtual xdebug-deps --upgrade --no-cache autoconf g++ make linux-headers \
 	&& pecl channel-update pecl.php.net \
 	&& case "$PHP_VERSION" in \
