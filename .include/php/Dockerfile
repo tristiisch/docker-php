@@ -5,7 +5,7 @@ ARG GROUP="app"
 ARG GROUP_ID="1000"
 
 # <=========================> PHP base <=========================>
-FROM php:$PHP_MAJOR-fpm-alpine AS base
+FROM php:${PHP_MAJOR}-fpm-alpine AS base
 ARG PHP_MAJOR
 ARG USER
 ARG USER_ID
@@ -47,9 +47,6 @@ RUN cp -f /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 # PHP custom production config
 COPY --chown=root:$USER --chmod=440 ./.include/php/configs/php-prod.ini /usr/local/etc/php/conf.d/zm-php.ini
-
-# SRCS
-COPY --chown=root:$USER --chmod=550 ./srcs ./
 
 USER $USER
 
