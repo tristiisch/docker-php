@@ -61,7 +61,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./.docker/Dockerfile
+          file: ./demo/php-native/.docker/Dockerfile
           context: ./demo/php-native
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -183,7 +183,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./.docker/Dockerfile
+          file: ./demo/php-native/.docker/Dockerfile
           context: ./demo/php-native
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
