@@ -1,50 +1,64 @@
-PROXY_SERVICE				:=	proxy
-APPLICATION_SERVICE			:=	application
+NGINX_IMAGE_NAME			= nginx:local
+PHP_IMAGE_NAME				= php:local
+PHP_CONF_DEFAULT_PATH		= ./php/configs/default
 
-STACK_PROD					:= web
-COMPOSE_PROD				:= ./.include/docker-compose.prod.yml
-COMPOSE_PROD_DEMO			:= ./docker-compose.prod-demo.yml
-ENV_PROD					:= .env.prod
 
-PHP_CONF_DEFAULT_PATH		:= ./.include/php/configs/default
+all:
+	@$(MAKE) -j2 nginx php
 
-all: build networks up logs
+nginx:
+	@docker build \
+		-f ./nginx/Dockerfile \
+		--target default \
+		-t $(NGINX_IMAGE_NAME) \
+		--pull \
+		./nginx
 
-build:
-	@docker compose build --pull always
+php:
+	@$(MAKE) -j2 php-8-production php-8-development
+	@$(MAKE) -j2 php-7-production php-7-development
+	@$(MAKE) -j2 php-5-production php-5-development
 
-networks:
-	@docker network create metrics 2> /dev/null || true
+php-8-production:
+	@$(MAKE) php-template \
+		PHP_MAJOR=8 \
+		PHP_TARGET_ENV=production
 
-up:
-	@docker compose up -d --remove-orphans
+php-8-development:
+	@$(MAKE) php-template \
+		PHP_MAJOR=8 \
+		PHP_TARGET_ENV=development
 
-up-f:
-	@docker compose up -d --remove-orphans --force-recreate
+php-7-production:
+	@$(MAKE) php-template \
+		PHP_MAJOR=7 \
+		PHP_TARGET_ENV=production
 
-logs:
-	@docker compose logs -f -n 100
+php-7-development:
+	@$(MAKE) php-template \
+		PHP_MAJOR=7 \
+		PHP_TARGET_ENV=development
 
-exec-nginx:
-	@docker compose exec $(PROXY_SERVICE) sh
+php-5-production:
+	@$(MAKE) php-template \
+		PHP_MAJOR=7 \
+		PHP_TARGET_ENV=production
 
-exec-php:
-	@docker compose exec $(APPLICATION_SERVICE) sh
+php-5-development:
+	@$(MAKE) php-template \
+		PHP_MAJOR=7 \
+		PHP_TARGET_ENV=development
 
-down:
-	@docker compose down
+php-template:
+	@docker build \
+		-f ./php/Dockerfile \
+		--target base_$(PHP_TARGET_ENV) \
+		-t $(PHP_IMAGE_NAME)-$(PHP_MAJOR)-$(PHP_TARGET_ENV) \
+		--pull \
+		--build-arg PHP_MAJOR=$(PHP_MAJOR) \
+		./php
 
-down-v:
-	@docker compose down -v
-
-test-prod:
-	@docker compose -f $(COMPOSE_PROD_DEMO) build --pull
-	@docker compose -f $(COMPOSE_PROD_DEMO) up -d --remove-orphans --force-recreate
-
-deploy-prod:
-	@export $(shell grep -v '^#' $(ENV_PROD) | xargs) > /dev/null 2>&1 && docker stack deploy --detach=false -c $(COMPOSE_PROD) $(STACK_PROD)
-
-update-php-conf-default:
+php-update-conf-default:
 	@for version in 5 7 8; do \
 		docker run --rm --entrypoint=cat php:$$version-fpm-alpine /usr/local/etc/php/php.ini-production > $(PHP_CONF_DEFAULT_PATH)/php-$$version-prod.default.ini & \
 		docker run --rm --entrypoint=cat php:$$version-fpm-alpine /usr/local/etc/php/php.ini-development > $(PHP_CONF_DEFAULT_PATH)/php-$$version-dev.default.ini & \
@@ -52,4 +66,4 @@ update-php-conf-default:
 		docker run --rm --entrypoint=cat php:$$version-fpm-alpine /usr/local/etc/php-fpm.conf > $(PHP_CONF_DEFAULT_PATH)/fpm-$$version-global.default.ini & \
 	done
 
-.PHONY: logs
+.PHONY: nginx php

@@ -1,0 +1,11 @@
+COMPOSE_PROD_DEMO			= ./.docker/docker-compose.prod-demo.yml -f ./.docker/docker-compose.prod-demo.override.yml
+
+prod:
+	@docker compose -f $(COMPOSE_PROD_DEMO) build --pull
+	@docker compose -f $(COMPOSE_PROD_DEMO) up -d --remove-orphans --force-recreate
+
+prod-php-exec:
+	@docker compose -f $(COMPOSE_PROD_DEMO) exec application ash
+
+prod-nginx-exec:
+	@docker compose -f $(COMPOSE_PROD_DEMO) exec proxy ash

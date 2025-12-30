@@ -16,7 +16,7 @@ EXPOSE 9000/tcp
 
 # Health Check
 RUN apk add --upgrade --no-cache fcgi
-COPY ./.include/php/scripts/healthcheck.sh /usr/local/bin/php-fpm-healthcheck
+COPY ./scripts/healthcheck.sh /usr/local/bin/php-fpm-healthcheck
 RUN chmod +x /usr/local/bin/php-fpm-healthcheck
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
     CMD php-fpm-healthcheck || exit 1
@@ -25,7 +25,7 @@ RUN addgroup -g $GROUP_ID $GROUP && \
     adduser -D -G $USER -u $USER_ID -s /sbin/nologin app
 
 # FPM config
-COPY --chown=root:$USER --chmod=550 ./.include/php/configs/fpm-${PHP_MAJOR}.ini /usr/local/etc/php-fpm.d/zm-custom.conf
+COPY --chown=root:$USER --chmod=550 ./configs/fpm-${PHP_MAJOR}.ini /usr/local/etc/php-fpm.d/zm-custom.conf
 
 # User & Workdir
 USER $USER
@@ -46,7 +46,7 @@ USER root
 RUN cp -f /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 # PHP custom production config
-COPY --chown=root:$USER --chmod=440 ./.include/php/configs/php-prod.ini /usr/local/etc/php/conf.d/zm-php.ini
+COPY --chown=root:$USER --chmod=440 ./configs/php-prod.ini /usr/local/etc/php/conf.d/zm-php.ini
 
 USER $USER
 
@@ -121,7 +121,4 @@ RUN cp -f /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 USER $USER
 
 # PHP custom dev config
-COPY --chown=root:$USER --chmod=440 ./.include/php/configs/php-dev.ini /usr/local/etc/php/conf.d/zm-php.ini
-
-# SRCS
-COPY --chown=root:$USER --chmod=550 ./srcs ./
+COPY --chown=root:$USER --chmod=440 ./configs/php-dev.ini /usr/local/etc/php/conf.d/zm-php.ini

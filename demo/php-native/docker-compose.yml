@@ -3,23 +3,19 @@ services:
   application:
     image: docker-php/php-demo:local
     build:
-      dockerfile: ./.include/php-demo/Dockerfile
+      dockerfile: ./.docker/Dockerfile
       target: app_development
       context: .
     volumes:
       - ./srcs:/var/www/html:ro
-    deploy:
-      replicas: 2
 
   proxy:
     image: docker-php/nginx-php:local
     build:
-      dockerfile: ./.include/nginx/Dockerfile
-      target: default
+      dockerfile: ./.docker/Dockerfile
+      target: proxy
       context: .
     volumes:
       - ./srcs:/var/www/html:ro
     ports:
       - 80:80
-    deploy:
-      replicas: 2

@@ -1,16 +1,17 @@
 name: Build Demo images
 
 on:
-  workflow_run:
-    workflows: ["Build base images"]
-    types:
-      - completed
+  push:
+    branches:
+      - "*"
+    paths:
+      - "demo/php-native/**"
   workflow_dispatch:
 
 env:
     REGISTRY_IMAGE: ${{ vars.DOCKER_REGISTRY_URL }}/${{ github.actor }}
-    IMAGE_PHP_APP_NAME: php-demo-fpm
-    IMAGE_PROXY_APP_NAME: php-demo-nginx
+    IMAGE_PHP_APP_NAME: demo-php-native-fpm
+    IMAGE_PROXY_APP_NAME: demo-php-native-nginx
 
 jobs:
 
@@ -60,8 +61,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./.include/php-demo/Dockerfile
-          context: .
+          file: ./.docker/Dockerfile
+          context: ./demo/php-native
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -182,8 +183,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./.include/php-demo/Dockerfile
-          context: .
+          file: ./.docker/Dockerfile
+          context: ./demo/php-native
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
