@@ -5,6 +5,14 @@ on:
     branches:
       - "*"
     paths:
+      - ".github/workflows/demo.yml"
+      - "demo/php-native/**"
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - "*"
+    paths:
+      - ".github/workflows/demo.yml"
       - "demo/php-native/**"
   workflow_dispatch:
 

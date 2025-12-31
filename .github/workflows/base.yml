@@ -5,7 +5,7 @@ on:
     branches:
       - "*"
     paths:
-      - ".github/workflows/images.yml"
+      - ".github/workflows/base.yml"
       - "nginx/**"
       - "php/**"
   pull_request:
@@ -13,7 +13,7 @@ on:
     branches:
       - "*"
     paths:
-      - ".github/workflows/images.yml"
+      - ".github/workflows/base.yml"
       - "nginx/**"
       - "php/**"
   workflow_dispatch:
@@ -80,7 +80,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile
+          file: ./php/Dockerfile
           context: ./php
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -203,7 +203,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile
+          file: ./nginx/Dockerfile
           context: ./nginx
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
